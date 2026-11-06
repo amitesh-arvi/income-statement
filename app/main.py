@@ -1,6 +1,17 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 
-app = FastAPI(title="Income Statement")
+from app.datasource import load_ledger
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    app.state.ledger = load_ledger()
+    yield
+
+
+app = FastAPI(title="Income Statement", lifespan=lifespan)
 
 
 @app.get("/")
